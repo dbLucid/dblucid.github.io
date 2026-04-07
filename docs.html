@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Display Manager — Documentation</title>
+    <meta name="description" content="User documentation for Ultimate Display Manager on Windows, including setup, core features, profiles, failsafe recovery, theming, troubleshooting, and CLI usage.">
+        <style>
+        @font-face {
+            font-family: "zpix";
+            src: url("zpix.ttf") format("truetype");
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: "Upheaval TT (BRK)";
+            src: url("upheavtt.ttf") format("truetype");
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+        :root {
+            --bg: #191919;
+            --panel: #232323;
+            --panel-2: #1f1f1f;
+            --border: #2a2a2a;
+            --text: #e6e6e6;
+            --muted: #9b9b9b;
+            --muted-2: #7a7a7a;
+            --heading: #ffffff;
+            --accent: #8764B8;
+            --accent-soft: rgba(135, 100, 184, 0.14);
+            --code: #141414;
+            --success: #9bd68f;
+            --warning: #e8c67a;
+            --shadow: 0 16px 44px rgba(0, 0, 0, 0.22);
+            --radius: 14px;
+            --radius-sm: 10px;
+            --content-width: 820px;
+            --sidebar-width: 260px;
+            --body-font: "zpix", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            --heading-font: "Upheaval TT (BRK)", "Arial Black", Impact, "Segoe UI", sans-serif;
+            --heading-letter-spacing: 0.125em;
+            --hero-letter-spacing: 0.055em;
+        }
+
+        * { box-sizing: border-box; }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            font-family: var(--body-font);
+            line-height: 1.85;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top right, rgba(135, 100, 184, 0.10), transparent 28%),
+                var(--bg);
+        }
+
+        a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        a:hover,
+        a:focus-visible {
+            text-decoration: underline;
+        }
+
+        .page {
+            max-width: 1220px;
+            margin: 0 auto;
+            padding: 28px 18px 48px;
+            display: grid;
+            grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+            gap: 28px;
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 20px;
+            align-self: start;
+            background: rgba(35, 35, 35, 0.92);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 18px;
+            backdrop-filter: blur(8px);
+        }
+
+        .sidebar-title {
+            font-size: 2.3rem;
+            color: var(--heading);
+            margin: 0 0 4px;
+            font-family: var(--heading-font);
+            letter-spacing: 0.085em;
+        }
+
+        .sidebar-title-link {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .sidebar-title-link:hover,
+        .sidebar-title-link:focus-visible {
+            color: #f1e8ff;
+            text-decoration: none;
+        }
+
+        .sidebar-subtitle {
+            margin: 0 0 14px;
+            color: var(--muted-2);
+            font-size: 0.94rem;
+        }
+
+        .sidebar-toggle {
+            display: none;
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--panel-2);
+            color: var(--text);
+            font: inherit;
+            padding: 10px 12px;
+            margin: 0 0 12px;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .toc {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            gap: 4px;
+        }
+
+        .toc a {
+            display: block;
+            padding: 8px 10px;
+            border-radius: 9px;
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+        .toc a:hover,
+        .toc a:focus-visible {
+            background: var(--accent-soft);
+            text-decoration: none;
+        }
+        main {
+            min-width: 0;
+        }
+
+        .hero,
+        .section-card {
+            background: rgba(35, 35, 35, 0.92);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .hero {
+            padding: 28px;
+            margin-bottom: 22px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .hero-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-start;
+            gap: 18px;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-logo {
+            width: 104px;
+            height: 104px;
+            object-fit: contain;
+            flex: 0 0 auto;
+            align-self: flex-start;
+            filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.22));
+            margin: 0;
+        }
+
+        .hero-copy {
+            min-width: 0;
+            width: 100%;
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            inset: auto -90px -90px auto;
+            width: 260px;
+            height: 260px;
+            background: radial-gradient(circle, rgba(135, 100, 184, 0.18), transparent 62%);
+            pointer-events: none;
+        }
+        h1 {
+            font-family: var(--heading-font);
+            font-size: clamp(2rem, 3.15vw, 2.85rem);
+            line-height: 1;
+            color: var(--heading);
+            margin: 0 0 16px;
+            max-width: none;
+            letter-spacing: var(--hero-letter-spacing);
+            white-space: nowrap;
+        }
+
+        .hero p {
+            margin: 0 0 16px;
+            max-width: none;
+            color: var(--text);
+            position: relative;
+            z-index: 1;
+            font-size: 0.94rem;
+        }
+
+        .hero-links {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 18px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .store-badge-wrap {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+        }
+
+        .store-badge-link {
+            line-height: 0;
+        }
+
+        .store-badge-img {
+            display: block;
+            height: 48px;
+            width: auto;
+        }
+
+        .button-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--panel-2);
+            color: var(--text);
+            font-weight: 600;
+            text-decoration: none;
+            letter-spacing: var(--heading-letter-spacing);
+        }
+
+        .button-link.primary {
+            background: linear-gradient(180deg, rgba(135, 100, 184, 0.24), rgba(135, 100, 184, 0.12));
+            border-color: rgba(135, 100, 184, 0.46);
+        }
+
+        .button-link:hover,
+        .button-link:focus-visible {
+            text-decoration: none;
+            filter: brightness(1.07);
+        }
+
+        .quick-grid {
+            margin-top: 22px;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .quick-card {
+            padding: 14px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: rgba(25, 25, 25, 0.62);
+        }
+
+        .quick-card strong {
+            display: block;
+            margin-bottom: 4px;
+            color: var(--heading);
+            font-family: var(--heading-font);
+            letter-spacing: var(--heading-letter-spacing);
+            font-size: 1.18rem;
+        }
+
+        .section-card {
+            padding: 26px;
+            margin-bottom: 20px;
+        }
+
+        .section-card h2 {
+            margin: 0 0 14px;
+            font-size: 2.12rem;
+            color: var(--heading);
+            scroll-margin-top: 20px;
+            font-family: var(--heading-font);
+            letter-spacing: var(--heading-letter-spacing);
+        }
+
+        .section-card h3 {
+            margin: 22px 0 10px;
+            font-size: 1.5rem;
+            color: var(--heading);
+            font-family: var(--heading-font);
+            letter-spacing: var(--heading-letter-spacing);
+        }
+
+        .section-card h4 {
+            margin: 18px 0 8px;
+            font-size: 1.24rem;
+            color: var(--heading);
+            font-family: var(--heading-font);
+            letter-spacing: var(--heading-letter-spacing);
+        }
+
+        .section-card p,
+        .section-card li {
+            color: var(--text);
+        }
+
+        .section-card p:last-child {
+            margin-bottom: 0;
+        }
+
+        .lead {
+            color: var(--muted);
+            font-size: 0.94rem;
+        }
+
+        .callout {
+            border: 1px solid rgba(135, 100, 184, 0.4);
+            background: var(--accent-soft);
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin: 16px 0;
+        }
+
+        .callout strong {
+            color: var(--heading);
+        }
+
+        .info-grid,
+        .feature-grid,
+        .steps,
+        .two-col {
+            display: grid;
+            gap: 14px;
+        }
+
+        .info-grid,
+        .feature-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .two-col {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .steps {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            counter-reset: step;
+        }
+
+        .mini-card,
+        .step-card,
+        .feature-card {
+            padding: 15px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--panel-2);
+        }
+
+        .step-card {
+            position: relative;
+            padding-left: 54px;
+        }
+
+        .step-card::before {
+            counter-increment: step;
+            content: counter(step);
+            position: absolute;
+            left: 15px;
+            top: 15px;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: var(--accent-soft);
+            border: 1px solid rgba(135, 100, 184, 0.45);
+            display: grid;
+            place-items: center;
+            color: var(--heading);
+            font-weight: 700;
+        }
+
+        .mini-card strong,
+        .feature-card strong,
+        .step-card strong {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--heading);
+            font-family: var(--heading-font);
+            letter-spacing: var(--heading-letter-spacing);
+            font-size: 1.14rem;
+        }
+
+        .badge-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 12px 0 4px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            font-size: 0.86rem;
+            color: var(--muted);
+        }
+
+        .tier-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 8px;
+            font-size: 0.86rem;
+            vertical-align: middle;
+            color: var(--muted);
+        }
+
+        ul,
+        ol {
+            padding-left: 1.2rem;
+        }
+
+        li + li {
+            margin-top: 0.45rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 14px 0;
+            font-size: 0.96rem;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--panel-2);
+        }
+
+        th,
+        td {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+            vertical-align: top;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        th {
+            color: var(--heading);
+            background: rgba(255, 255, 255, 0.03);
+            font-weight: 600;
+        }
+
+        code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+            font-size: 0.94em;
+            color: #f2ebff;
+        }
+
+        :not(pre) > code {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.14em 0.4em;
+            border-radius: 7px;
+        }
+
+        .code-block {
+            margin: 14px 0;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--code);
+        }
+
+        .code-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+            background: #1a1a1a;
+            color: var(--muted);
+            font-size: 0.86rem;
+        }
+
+        .copy-btn {
+            border: 1px solid var(--border);
+            background: var(--panel-2);
+            color: var(--text);
+            font: inherit;
+            font-size: 0.86rem;
+            border-radius: 8px;
+            padding: 7px 10px;
+            cursor: pointer;
+        }
+
+        .copy-btn:hover,
+        .copy-btn:focus-visible {
+            filter: brightness(1.08);
+        }
+
+        pre {
+            margin: 0;
+            padding: 14px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .kbd {
+            display: inline-block;
+            padding: 0.1rem 0.42rem;
+            border: 1px solid #4b4b4b;
+            border-bottom-width: 2px;
+            border-radius: 6px;
+            background: #242424;
+            font-size: 0.88em;
+            line-height: 1.4;
+            color: var(--heading);
+            white-space: nowrap;
+        }
+
+        .shot {
+            margin: 16px 0;
+            border: 1px dashed rgba(135, 100, 184, 0.55);
+            border-radius: 12px;
+            background: linear-gradient(180deg, rgba(135, 100, 184, 0.08), rgba(255, 255, 255, 0.02));
+            overflow: hidden;
+        }
+
+        .shot-box {
+            min-height: 240px;
+            display: grid;
+            place-items: center;
+            text-align: center;
+            padding: 20px;
+            color: var(--muted);
+            font-size: 0.96rem;
+        }
+
+        .shot figcaption {
+            border-top: 1px dashed rgba(135, 100, 184, 0.35);
+            padding: 10px 14px;
+            color: var(--muted);
+            font-size: 0.92rem;
+        }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            margin: 18px 0 0;
+        }
+
+        .preview-tile {
+            width: 100%;
+            padding: 0;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--panel-2);
+            color: var(--text);
+            text-align: left;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .preview-tile:hover,
+        .preview-tile:focus-visible {
+            border-color: rgba(135, 100, 184, 0.52);
+            box-shadow: 0 0 0 1px rgba(135, 100, 184, 0.16) inset;
+        }
+
+        .preview-visual {
+            min-height: 160px;
+            display: grid;
+            place-items: center;
+            padding: 18px;
+            text-align: center;
+            color: var(--muted);
+            background: linear-gradient(180deg, rgba(135, 100, 184, 0.12), rgba(255, 255, 255, 0.02));
+            border-bottom: 1px solid var(--border);
+        }
+
+        .preview-body {
+            padding: 12px 14px 14px;
+        }
+
+        .preview-body strong {
+            display: block;
+            margin-bottom: 4px;
+            color: var(--heading);
+            font-family: var(--heading-font);
+            letter-spacing: var(--heading-letter-spacing);
+            font-size: 1.14rem;
+        }
+
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: rgba(0, 0, 0, 0.78);
+            z-index: 1000;
+        }
+
+        .lightbox.open {
+            display: flex;
+        }
+
+        .lightbox-panel {
+            width: min(960px, 100%);
+            max-height: 88vh;
+            overflow: auto;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: var(--panel);
+            box-shadow: var(--shadow);
+        }
+
+        .lightbox-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .lightbox-title {
+            margin: 0;
+            font-size: 1.25rem;
+            color: var(--heading);
+            font-family: var(--heading-font);
+            letter-spacing: var(--heading-letter-spacing);
+        }
+
+        .lightbox-close {
+            border: 1px solid var(--border);
+            background: var(--panel-2);
+            color: var(--text);
+            border-radius: 10px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font: inherit;
+        }
+
+        .lightbox-visual {
+            min-height: 420px;
+            display: grid;
+            place-items: center;
+            padding: 28px;
+            text-align: center;
+            color: var(--muted);
+            background: linear-gradient(180deg, rgba(135, 100, 184, 0.12), rgba(255, 255, 255, 0.03));
+        }
+
+        .lightbox-caption {
+            padding: 16px;
+            color: var(--muted);
+        }
+
+        .changelog-card {
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--panel-2);
+            margin-top: 14px;
+        }
+
+        .changelog-card h3 {
+            margin-top: 0;
+        }
+
+        .footer {
+            margin-top: 24px;
+            padding: 22px 26px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: rgba(35, 35, 35, 0.92);
+            color: var(--muted);
+            font-size: 0.94rem;
+        }
+
+        .muted {
+            color: var(--muted);
+        }
+
+        .success {
+            color: var(--success);
+        }
+
+        .warning {
+            color: var(--warning);
+        }
+
+        @media (max-width: 980px) {
+            .page {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .toc-wrap {
+                display: none;
+            }
+
+            .sidebar.open .toc-wrap {
+                display: block;
+            }
+
+            .quick-grid,
+            .info-grid,
+            .feature-grid,
+            .steps,
+            .two-col,
+            .preview-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-top {
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .page {
+                padding: 14px 12px 34px;
+                gap: 16px;
+            }
+
+            .hero,
+            .section-card,
+            .footer,
+            .sidebar {
+                padding: 18px;
+            }
+
+            .hero-top {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .hero-logo {
+                width: 72px;
+                height: 72px;
+            }
+
+            h1 {
+                max-width: none;
+                font-size: clamp(1.7rem, 8vw, 2.45rem);
+                white-space: normal;
+            }
+
+            .hero-links {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .store-badge-wrap,
+            .button-link {
+                width: 100%;
+                max-width: 320px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <aside class="sidebar" id="sidebar">
+            <button class="sidebar-toggle" type="button" aria-expanded="false" aria-controls="toc-wrap" onclick="toggleToc()">Sections</button>
+            <div class="toc-wrap" id="toc-wrap">
+                <h2 class="sidebar-title"><a class="sidebar-title-link" href="#top">UDM</a></h2>
+                <p class="sidebar-subtitle">Documentation</p>
+                <ul class="toc">
+                    <li><a href="#intro">What is UDM?</a></li>
+                    <li><a href="#installation">Installation</a></li>
+                    <li><a href="#quick-start">First run & quick start</a></li>
+                    <li><a href="#options-window">The Options window</a></li>
+                    <li><a href="#monitor-actions">Monitor list & actions</a></li>
+                    <li><a href="#layout-editor">Layout editor</a></li>
+                    <li><a href="#profiles">Profiles</a></li>
+                    <li><a href="#failsafe">Failsafe recovery</a></li>
+                    <li><a href="#theming">Theming & customization</a></li>
+                    <li><a href="#cli">CLI reference</a></li>
+                    <li><a href="#pro">UDM Pro</a></li>
+                    <li><a href="#troubleshooting">Troubleshooting</a></li>
+                    <li><a href="#privacy">Privacy & data</a></li>
+                    <li><a href="#changelog">Changelog</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <main>
+            <section class="hero" id="top">
+                <div class="hero-top">
+                    <img class="hero-logo" src="UDM-Icon-noBG-512x512.png" alt="UDM logo">
+                    <div class="hero-copy">
+                        <h1>Ultimate Display Manager</h1>
+                        <p>
+                            UDM helps you manage monitor layouts, resolution, refresh rate, orientation, DPI scaling, HDR,
+                            cloning, display positioning, and profile-based setup switching from one app that lives in your system tray.
+                        </p>
+                        <p>
+                            It is designed to feel simple when you just want to fix something quickly, while still giving power users deeper control
+                            through profiles, recovery tools, and command-line workflows.
+                        </p>
+                    </div>
+                </div>
+                <div class="hero-links">
+                    <div class="store-badge-wrap">
+                        <a class="store-badge-link" href="https://get.microsoft.com/installer/download/9NQ935PZCNVJ?referrer=appbadge" target="_self">
+                            <img class="store-badge-img" src="https://get.microsoft.com/images/en-us%20light.svg" alt="Download from the Microsoft Store">
+                        </a>
+                    </div>
+                    <a class="button-link primary" href="#quick-start">Start here</a>
+                    <a class="button-link" href="#cli">CLI reference</a>
+                    <a class="button-link" href="privacy-policy.html">Privacy policy</a>
+                </div>
+                <div class="quick-grid">
+                    <div class="quick-card">
+                        <strong>No admin required</strong>
+                        Installs through the Microsoft Store and runs without UAC prompts.
+                    </div>
+                    <div class="quick-card">
+                        <strong>Lite + Pro</strong>
+                        The free app handles direct display control, while Pro adds profiles, failsafe recovery, and more.
+                    </div>
+                    <div class="quick-card">
+                        <strong>Built for real setups</strong>
+                        Works best as a practical Windows utility, not a one-feature toy.
+                    </div>
+                </div>
+            </section>
+
+            <section class="section-card" id="intro">
+                <h2>What is UDM?</h2>
+                <p class="lead">
+                    Ultimate Display Manager is a Windows desktop utility for managing multi-monitor setups with less friction than the built-in Windows display controls.
+                </p>
+                <div class="info-grid">
+                    <div class="mini-card">
+                        <strong>What it can do</strong>
+                        Manage topology, resolution, refresh rate, orientation, DPI scaling, HDR, display cloning, display positioning, and recovery-oriented profile switching.
+                    </div>
+                    <div class="mini-card">
+                        <strong>Who it is for</strong>
+                        Anyone who wants faster control over a desktop or laptop display setup, from casual users to power users with multiple saved layouts.
+                    </div>
+                    <div class="mini-card">
+                        <strong>Where it is available</strong>
+                        UDM is distributed through the Microsoft Store for Windows 10 and Windows 11.
+                    </div>
+                    <div class="mini-card">
+                        <strong>How it feels</strong>
+                        Practical, trustworthy, and easy to reach from the tray, with deeper tools ready when you need them.
+                    </div>
+                </div>
+                <div class="preview-grid">
+                    <button class="preview-tile" type="button" onclick="openPreview('Options window', 'Preview image placeholder for the main Options window. Replace later with a full UI capture that shows the layout editor and profile area.')">
+                        <div class="preview-visual">Preview image placeholder<br>Main Options window</div>
+                        <div class="preview-body">
+                            <strong>Options window</strong>
+                            Main workspace with the layout editor and display controls.
+                        </div>
+                    </button>
+                    <button class="preview-tile" type="button" onclick="openPreview('Tray menu', 'Preview image placeholder for the tray menu. Replace later with a capture showing fast access to displays, profiles, and core actions.')">
+                        <div class="preview-visual">Preview image placeholder<br>Tray menu</div>
+                        <div class="preview-body">
+                            <strong>Tray menu</strong>
+                            Quick access to displays, profiles, hotkeys, and app actions.
+                        </div>
+                    </button>
+                    <button class="preview-tile" type="button" onclick="openPreview('Display Properties', 'Preview image placeholder for the Display Properties window. Replace later with a capture showing grouped per-display settings.')">
+                        <div class="preview-visual">Preview image placeholder<br>Display Properties</div>
+                        <div class="preview-body">
+                            <strong>Display Properties</strong>
+                            A focused editor for changing settings on one display at a time.
+                        </div>
+                    </button>
+                </div>
+
+
+                <figure class="shot">
+                    <div class="shot-box">
+                        Screenshot placeholder<br>
+                        Main app overview / Options window hero image
+                    </div>
+                    <figcaption>Replace with a clean full-window screenshot that shows the layout editor and overall app styling.</figcaption>
+                </figure>
+            </section>
+
+            <section class="section-card" id="installation">
+                <h2>Installation</h2>
+                <p class="lead">UDM installs through the Microsoft Store and keeps its writable data outside the app install folder.</p>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <strong>Where to install</strong>
+                        Search the Microsoft Store for <em>UDM - Ultimate Display Manager for Windows</em>.
+                    </div>
+                    <div class="feature-card">
+                        <strong>System requirements</strong>
+                        Windows 10 build 19041 or later, on either x64 or x86 systems.
+                    </div>
+                    <div class="feature-card">
+                        <strong>Permissions</strong>
+                        UDM is designed to run without admin rights.
+                    </div>
+                    <div class="feature-card">
+                        <strong>Tiers</strong>
+                        The Store install includes UDM Lite for free, with an optional in-app upgrade to UDM Pro.
+                    </div>
+                </div>
+
+                <h3>Where your files go</h3>
+                <ul>
+                    <li><strong>App data and settings:</strong> stored under <code>%LOCALAPPDATA%\Ultimate Display Manager</code></li>
+                    <li><strong>Profiles, logs, and backups:</strong> stored under <code>%USERPROFILE%\Documents\Ultimate Display Manager</code></li>
+                    <li><strong>Install folder:</strong> not used for writable data</li>
+                </ul>
+
+                <h3>Launching UDM</h3>
+                <p>
+                    After installation, you can launch UDM from the Start menu. You can also run <code>udm</code> from a terminal,
+                    the Run dialog, or a shortcut.
+                </p>
+
+                <div class="callout">
+                    <strong>Profile files:</strong> UDM profile files use the <code>.udmp</code> extension. On Pro, double-clicking a profile file can apply it directly.
+                </div>
+            </section>
+
+            <section class="section-card" id="quick-start">
+                <h2>First run & quick start</h2>
+                <p class="lead">UDM lives in the system tray after launch, so most of your day-to-day control starts there.</p>
+
+                <h3>What happens when you launch it</h3>
+                <ul>
+                    <li>The UDM tray icon appears in the Windows notification area.</li>
+                    <li>Lite users get a one-time welcome notification.</li>
+                    <li>Pro users who have not created a failsafe yet are taken straight to the Options window so they can finish first-time setup.</li>
+                    <li>If a failsafe already exists, UDM follows your normal startup preference and either opens the Options window or starts minimized to tray.</li>
+                </ul>
+
+                <h3>Tray icon behavior</h3>
+                <div class="two-col">
+                    <div class="mini-card">
+                        <strong>Right-click</strong>
+                        Opens the full tray menu with monitor actions, profiles, hotkeys, Options, About, and Exit.
+                    </div>
+                    <div class="mini-card">
+                        <strong>Left-click</strong>
+                        Opens the Options window. By default this is a single click, but you can change it to double-click in Settings.
+                    </div>
+                </div>
+
+                <h3>A good first five minutes</h3>
+                <div class="steps">
+                    <div class="step-card"><strong>Launch UDM</strong> and confirm the tray icon is visible.</div>
+                    <div class="step-card"><strong>Open the Options window</strong> with a left-click on the tray icon.</div>
+                    <div class="step-card"><strong>Look at the layout editor</strong> to match the app's display view to your desk setup.</div>
+                    <div class="step-card"><strong>Try a direct action</strong> such as changing orientation, resolution, or primary display.</div>
+                    <div class="step-card"><strong>Pro users:</strong> set your failsafe layout before building a profile library.</div>
+                    <div class="step-card"><strong>Return to the tray menu</strong> when you want fast everyday access without keeping the window open.</div>
+                </div>
+            </section>
+
+            <section class="section-card" id="options-window">
+                <h2>The Options window</h2>
+                <p class="lead">The Options window is the main control surface for UDM.</p>
+
+                <h3>Top area</h3>
+                <ul>
+                    <li>The app title opens the About window.</li>
+                    <li>The version label is shown beside the title.</li>
+                    <li>The <strong>Settings</strong> button opens the Settings window.</li>
+                </ul>
+
+                <h3>Failsafe row <span class="tier-pill">Pro</span></h3>
+                <p>
+                    If you use Pro, the Options window includes a failsafe button near the top. Before setup it reads <strong>Set failsafe (Setup)</strong>.
+                    After setup it changes to <strong>Update failsafe layout</strong>.
+                </p>
+
+                <h3>Profile row <span class="tier-pill">Visible in both tiers, active in Pro</span></h3>
+                <ul>
+                    <li><strong>Profile dropdown</strong> — lists saved profiles</li>
+                    <li><strong>Load profile</strong> — applies the selected profile</li>
+                    <li><strong>Save current layout</strong> — saves the live display state as a profile</li>
+                    <li><strong>…</strong> — opens more profile actions such as rename, export, import, and recovery</li>
+                </ul>
+                <p>
+                    In Lite, these controls stay visible but route you to the upgrade flow instead of performing profile actions.
+                </p>
+
+                <h3>Main center area</h3>
+                <ul>
+                    <li><strong>Layout editor</strong> — a visual canvas of your displays</li>
+                    <li><strong>Display action buttons</strong> — fast actions for the current selection <span class="tier-pill">Pro</span></li>
+                    <li><strong>Monitor list</strong> — the detailed table view of your displays <span class="tier-pill">Pro</span></li>
+                </ul>
+
+                <h3>Bottom area</h3>
+                <ul>
+                    <li><strong>Edit hotkeys…</strong> opens the Hotkey Editor</li>
+                    <li><strong>Close</strong> hides the window</li>
+                    <li>Lite users see <strong>Upgrade!</strong> in the footer</li>
+                    <li>Pro users see <strong>Donate!</strong>, which can be hidden in settings if preferred</li>
+                </ul>
+
+                <figure class="shot">
+                    <div class="shot-box">
+                        Screenshot placeholder<br>
+                        Full Options window with labels or clean crop
+                    </div>
+                    <figcaption>Good place for a guided screenshot showing the profile row, layout editor, and footer.</figcaption>
+                </figure>
+            </section>
+
+            <section class="section-card" id="monitor-actions">
+                <h2>Monitor list & per-monitor actions</h2>
+                <p class="lead">UDM gives you both quick tray actions and a more detailed monitor list for precise work.</p>
+
+                <h3>Monitor list <span class="tier-pill">Pro</span></h3>
+                <ul>
+                    <li>Shows each known display in a sortable multi-column table.</li>
+                    <li>Supports keyboard control, multi-select, and double-click to open Display Properties.</li>
+                    <li>Can remember your chosen sorting when that setting is enabled.</li>
+                </ul>
+
+                <h3>Why there are two monitor menus</h3>
+                <div class="two-col">
+                    <div class="mini-card">
+                        <strong>Tray menu version</strong>
+                        Includes a shortcut into the detailed window because you are not already inside it.
+                    </div>
+                    <div class="mini-card">
+                        <strong>Monitor list right-click version</strong>
+                        Skips that extra shortcut and instead adds display naming tools for quicker editing in-place.
+                    </div>
+                </div>
+
+                <h3>Available per-monitor actions</h3>
+                <ul>
+                    <li>Set as primary</li>
+                    <li>Solo a display</li>
+                    <li>Enable or disable a display</li>
+                    <li>Extend in several ways, including variants that re-enable displays</li>
+                    <li>Clone one display to another, to a group, or to all compatible displays</li>
+                    <li>Stop cloning</li>
+                    <li>Change orientation, resolution, refresh rate, and scale</li>
+                    <li>Toggle HDR on supported displays</li>
+                    <li>Power a display on or off through DDC/CI on supported hardware</li>
+                    <li>Copy common monitor identifiers and details</li>
+                    <li>Open Display Properties</li>
+                </ul>
+
+                <div class="callout">
+                    <strong>Safety behavior:</strong> when a display is part of an active clone group, UDM intentionally hides settings that could desync the group.
+                </div>
+
+                <h3>Display Properties window</h3>
+                <p>
+                    The Display Properties window gives you a focused editor for one display. From there you can toggle enable state, power,
+                    primary status, orientation, resolution, refresh rate, DPI scaling, and HDR when supported, then apply several changes together.
+                </p>
+
+                <h3>Display naming <span class="tier-pill">Pro</span></h3>
+                <p>
+                    You can give a display a custom name to make similar monitors easier to tell apart. That name shows up throughout the app and can also be used in CLI targeting.
+                </p>
+            </section>
+
+            <section class="section-card" id="layout-editor">
+                <h2>Layout editor</h2>
+                <p class="lead">The layout editor is the visual heart of UDM and is available in both Lite and Pro.</p>
+
+                <h3>What it shows</h3>
+                <p>
+                    Each active or known display appears as a draggable rectangle, arranged in roughly the same way Windows sees your monitor layout.
+                </p>
+
+                <h3>How to use it</h3>
+                <ul>
+                    <li>Click a display to select it.</li>
+                    <li>Drag a display to reposition it.</li>
+                    <li>Use <span class="kbd">Ctrl</span> + click to add or remove displays from the selection.</li>
+                    <li>Drag empty space to draw a selection box.</li>
+                    <li>Drag a multi-selection to move a group together.</li>
+                    <li>Hold <span class="kbd">Ctrl</span> while dragging for finer movement.</li>
+                    <li>Snapping helps align edges and corners cleanly.</li>
+                </ul>
+
+                <h3>Tabs above the canvas</h3>
+                <p>
+                    When relevant, UDM shows tabs for active displays, inactive displays, and clone-group views so you can focus on the right slice of your setup.
+                </p>
+
+                <h3>Selection sync <span class="tier-pill">Pro</span></h3>
+                <p>
+                    In Pro, selecting a display in the layout editor also highlights its row in the monitor list, and selecting a row in the list highlights the display on the canvas.
+                </p>
+
+                <h3>Identify overlay</h3>
+                <p>
+                    Use the identify control in the app or run <code>udm --identify</code> to show a large number on each real monitor so you can match the on-screen layout to your physical desk.
+                </p>
+
+                <figure class="shot">
+                    <div class="shot-box">
+                        Screenshot placeholder<br>
+                        Layout editor close-up or identify overlay capture
+                    </div>
+                    <figcaption>Use a screenshot that clearly communicates drag-and-drop layout editing.</figcaption>
+                </figure>
+            </section>
+
+            <section class="section-card" id="profiles">
+                <h2>Profiles <span class="tier-pill">Pro</span></h2>
+                <p class="lead">Profiles let you save complete display setups and switch between them later.</p>
+
+                <h3>What a profile remembers</h3>
+                <p>
+                    A profile saves the live state of your display setup, including topology, primary display, resolution, refresh rate,
+                    orientation, HDR state, DPI scale, positioning, and active cloning.
+                </p>
+
+                <h3>What you can do with profiles</h3>
+                <div class="feature-grid">
+                    <div class="feature-card"><strong>Save</strong> the current layout as a named profile.</div>
+                    <div class="feature-card"><strong>Load</strong> a profile to return to that exact setup.</div>
+                    <div class="feature-card"><strong>Rename</strong> a profile when your library grows.</div>
+                    <div class="feature-card"><strong>Delete and recover</strong> profiles through the built-in backup flow.</div>
+                    <div class="feature-card"><strong>Import</strong> a <code>.udmp</code> file into UDM.</div>
+                    <div class="feature-card"><strong>Export</strong> a profile to a <code>.udmp</code> file for sharing or backup.</div>
+                </div>
+
+                <h3>Where profile controls appear</h3>
+                <ul>
+                    <li>The profile row in the Options window</li>
+                    <li>The Profiles submenu in the tray menu</li>
+                    <li>The tray shortcut for creating a profile from the current layout</li>
+                    <li>The tray command for reloading the most recently loaded profile</li>
+                </ul>
+
+                <div class="callout">
+                    <strong>Good habit:</strong> set your failsafe first, then build your profile library. That way UDM always has a known-good layout to fall back to.
+                </div>
+            </section>
+
+            <section class="section-card" id="failsafe">
+                <h2>Failsafe recovery <span class="tier-pill">Pro</span></h2>
+                <p class="lead">Failsafe is UDM’s recovery safety net for risky or unusual display transitions.</p>
+
+                <h3>What it is</h3>
+                <p>
+                    Your failsafe is a saved, known-good display layout. If something goes wrong during a switch, UDM can use that layout to bring you back to a working state.
+                </p>
+
+                <h3>Why it matters</h3>
+                <p>
+                    Some display changes can fail in messy ways because of drivers, disappearing displays, clone-group edge cases, or unusual hardware situations.
+                    Failsafe exists so you are less likely to get stranded in a broken configuration.
+                </p>
+
+                <h3>How to set it up</h3>
+                <ul>
+                    <li>Open the Options window.</li>
+                    <li>Click <strong>Set failsafe (Setup)</strong> if you have not created one yet.</li>
+                    <li>Later, use <strong>Update failsafe layout</strong> whenever your preferred safe layout changes.</li>
+                </ul>
+
+                <h3>How to trigger it</h3>
+                <ul>
+                    <li>From the tray menu</li>
+                    <li>From the dedicated failsafe hotkey</li>
+                    <li>Automatically, when UDM can recover from a failed or risky operation</li>
+                </ul>
+
+                <h3>Safe switching</h3>
+                <p>
+                    Pro also includes a Safe switching setting that adds extra caution and delay to certain profile transitions.
+                    Its current on/off state is shown in the Options window footer.
+                </p>
+            </section>
+
+            <section class="section-card" id="theming">
+                <h2>Theming & customization</h2>
+                <p class="lead">UDM lets you tailor both the look of the app and, in Pro, how much UI is visible.</p>
+
+                <h3>Theme options</h3>
+                <ul>
+                    <li><strong>System</strong> — follows your Windows theme</li>
+                    <li><strong>Light</strong> — bright interface with its own accent color</li>
+                    <li><strong>Dark</strong> — dark interface with its own accent color</li>
+                </ul>
+                <p>
+                    Both Light and Dark themes have separate accent color controls, each with a default reset button.
+                </p>
+
+                <h3>Customize UI <span class="tier-pill">Pro</span></h3>
+                <p>
+                    Pro users can open <strong>Customize UI…</strong> from Settings to decide how much of the Options window and monitor menus they want to keep visible.
+                </p>
+                <ul>
+                    <li>Hide or show the display action button row</li>
+                    <li>Hide or show the monitor list</li>
+                    <li>Hide or show the info footer</li>
+                    <li>Choose the number of visible monitor list rows</li>
+                    <li>Hide monitor-menu categories you never use</li>
+                </ul>
+            </section>
+
+            <section class="section-card" id="cli">
+                <h2>CLI reference</h2>
+                <p class="lead">
+                    UDM includes a real command-line interface, so you can control the app from Command Prompt, PowerShell, Windows Terminal, the Run dialog, scripts, or shortcuts.
+                </p>
+
+                <div class="callout">
+                    <strong>Important:</strong> the free tier covers direct display control. Pro adds profile management, recovery flows, display naming, and other persistence-oriented commands.
+                </div>
+
+                <h3>Getting started</h3>
+                <p>
+                    The main command is simply <code>udm</code>. Many commands can be run while the app is closed, and UDM will perform the action and exit cleanly.
+                    If UDM is already running, the command can hand off to the existing instance instead of launching a second copy.
+                </p>
+
+                <div class="code-block">
+                    <div class="code-head">
+                        <span>Basic examples</span>
+                        <button class="copy-btn" type="button" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><code>udm --help
+udm --version
+udm --list-displays
+udm --status</code></pre>
+                </div>
+
+                <h3>Read-only and discovery commands</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Command</th>
+                                <th>What it does</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>--help</code></td><td>Show the grouped help output</td></tr>
+                            <tr><td><code>--version</code></td><td>Print the installed app version</td></tr>
+                            <tr><td><code>--status</code></td><td>Show runtime status, with display-aware output when combined with a selector</td></tr>
+                            <tr><td><code>--list-displays</code></td><td>List displays and their key metadata</td></tr>
+                            <tr><td><code>--list-settings</code></td><td>List visible user settings for your current tier</td></tr>
+                            <tr><td><code>--list-hotkeys</code></td><td>List the visible hotkey rows</td></tr>
+                            <tr><td><code>--list-profiles</code></td><td>List saved profiles <span class="tier-pill">Pro</span></td></tr>
+                            <tr><td><code>--list-backups</code></td><td>List deleted profiles that can be restored <span class="tier-pill">Pro</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Choosing which display to target</h3>
+                <p>You can target displays with selectors such as:</p>
+                <ul>
+                    <li><code>primary</code></li>
+                    <li><code>all</code></li>
+                    <li><code>active</code></li>
+                    <li><code>index:2</code></li>
+                    <li><code>serial:...</code></li>
+                    <li><code>name:Office Monitor</code></li>
+                    <li><code>id:...</code></li>
+                </ul>
+
+                <div class="code-block">
+                    <div class="code-head">
+                        <span>Targeting examples</span>
+                        <button class="copy-btn" type="button" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><code>udm --display index:2 --set-primary
+udm --display primary --resolution 2560x1440
+udm --display name:"Desk OLED" --hdr off</code></pre>
+                </div>
+
+                <h3>Common direct-control commands</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Command</th>
+                                <th>What it does</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>--enable</code> / <code>--disable</code></td><td>Enable or disable the target display</td></tr>
+                            <tr><td><code>--set-primary</code></td><td>Make the target display the primary display</td></tr>
+                            <tr><td><code>--resolution &lt;WxH&gt;</code></td><td>Set the resolution</td></tr>
+                            <tr><td><code>--refresh &lt;Hz&gt;</code></td><td>Set the refresh rate</td></tr>
+                            <tr><td><code>--orientation &lt;value&gt;</code></td><td>Change orientation</td></tr>
+                            <tr><td><code>--hdr on|off|toggle</code></td><td>Control HDR on supported displays</td></tr>
+                            <tr><td><code>--scale &lt;percent&gt;</code></td><td>Set DPI scaling</td></tr>
+                            <tr><td><code>--power on|off</code></td><td>Power a display on or off through DDC/CI when supported</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Set several properties at once</h3>
+                <p>Use <code>--set</code> when you want one final state from a single command.</p>
+                <div class="code-block">
+                    <div class="code-head">
+                        <span>Multi-property apply</span>
+                        <button class="copy-btn" type="button" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><code>udm --display primary --set resolution=2560x1440 refresh=144 hdr=off</code></pre>
+                </div>
+
+                <h3>Topology and layout helpers</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Command</th>
+                                <th>What it does</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>--topology extend</code></td><td>Switch to extended desktop mode</td></tr>
+                            <tr><td><code>--topology clone</code></td><td>Switch to a cloned setup</td></tr>
+                            <tr><td><code>--topology internal</code></td><td>Use the built-in display only, when available</td></tr>
+                            <tr><td><code>--topology external</code></td><td>Use external display output only</td></tr>
+                            <tr><td><code>--identify</code></td><td>Show the identify overlay on your displays</td></tr>
+                            <tr><td><code>--properties-open &lt;display&gt;</code></td><td>Open the Display Properties window for a specific display</td></tr>
+                            <tr><td><code>--options</code></td><td>Open or focus the Options window</td></tr>
+                            <tr><td><code>--minimize</code></td><td>Minimize UDM</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Settings, startup, and app helpers</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Command</th>
+                                <th>What it does</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>--set-setting key=value</code></td><td>Change one or more visible app settings</td></tr>
+                            <tr><td><code>--restoredefault</code></td><td>Reset settings to defaults</td></tr>
+                            <tr><td><code>--startup-task on</code></td><td>Enable Start with Windows</td></tr>
+                            <tr><td><code>--startup-task off</code></td><td>Disable Start with Windows</td></tr>
+                            <tr><td><code>--upgrade</code></td><td>Open the UDM Pro purchase flow</td></tr>
+                            <tr><td><code>--update</code></td><td>Check for app updates</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Profiles and recovery <span class="tier-pill">Pro</span></h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Command</th>
+                                <th>What it does</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>--profile &lt;name&gt;</code></td><td>Load a saved profile</td></tr>
+                            <tr><td><code>--save-profile &lt;name&gt;</code></td><td>Save the current layout as a profile</td></tr>
+                            <tr><td><code>--import &lt;path&gt;</code></td><td>Import a <code>.udmp</code> file</td></tr>
+                            <tr><td><code>--export-profile &lt;name&gt; &lt;path&gt;</code></td><td>Export a profile</td></tr>
+                            <tr><td><code>--rename-profile &lt;old&gt; &lt;new&gt;</code></td><td>Rename a profile</td></tr>
+                            <tr><td><code>--delete-profile &lt;name&gt;</code></td><td>Delete a profile</td></tr>
+                            <tr><td><code>--list-backups</code></td><td>List deleted profiles that can be recovered</td></tr>
+                            <tr><td><code>--restore-backup &lt;index|filename&gt;</code></td><td>Restore a deleted profile backup</td></tr>
+                            <tr><td><code>--failsafe-set</code></td><td>Create your first failsafe from the current layout</td></tr>
+                            <tr><td><code>--failsafe-update</code></td><td>Refresh the existing failsafe from the current layout</td></tr>
+                            <tr><td><code>--rename-display</code></td><td>Set or clear a custom display name</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Output and scripting flags</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Flag</th>
+                                <th>Use it for</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>--json</code></td><td>Machine-readable output</td></tr>
+                            <tr><td><code>--quiet</code></td><td>Suppress normal output and prompts</td></tr>
+                            <tr><td><code>--interactive</code></td><td>Allow prompts, message boxes, and upgrade UI</td></tr>
+                            <tr><td><code>--dry-run</code></td><td>Light validation before running a command</td></tr>
+                            <tr><td><code>--force</code></td><td>Override certain guardrails for risky or overwrite-style actions</td></tr>
+                            <tr><td><code>--exit</code></td><td>Close a running UDM instance after the command finishes successfully</td></tr>
+                            <tr><td><code>--force-exit</code></td><td>Close a running instance even if the command fails</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Helpful examples</h3>
+                <div class="code-block">
+                    <div class="code-head">
+                        <span>Copy-friendly examples</span>
+                        <button class="copy-btn" type="button" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><code>udm --display index:2 --set-primary
+udm --display primary --set resolution=2560x1440 refresh=144 hdr=off
+udm --display active --power off
+udm --topology internal
+udm --profile "Work Layout"
+udm "C:\path\to\profile.udmp"
+udm --save-profile "Movie Mode"
+udm --update --quiet --json
+udm --options</code></pre>
+                </div>
+
+                <h3>Exit codes</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Meaning</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>0</code></td><td>Success</td></tr>
+                            <tr><td><code>1</code></td><td>Usage or parse error</td></tr>
+                            <tr><td><code>2</code></td><td>Not found</td></tr>
+                            <tr><td><code>3</code></td><td>Validation or unsupported request</td></tr>
+                            <tr><td><code>4</code></td><td>Requires Pro</td></tr>
+                            <tr><td><code>5</code></td><td>Execution failed</td></tr>
+                            <tr><td><code>6</code></td><td>Conflict or blocked by current state</td></tr>
+                            <tr><td><code>7</code></td><td>Helper or system failure</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Recipe mode</h3>
+                <p>
+                    UDM can also run JSON recipe files with <code>--run &lt;file&gt;</code>. Recipes stop on the first failed step and can combine direct display commands,
+                    waits, profile actions, and a few UI boundary helpers.
+                </p>
+                <div class="code-block">
+                    <div class="code-head">
+                        <span>Simple recipe example</span>
+                        <button class="copy-btn" type="button" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><code>{
+  "steps": [
+    "--topology extend",
+    "--wait 1000",
+    "--display primary --set resolution=2560x1440 refresh=144"
+  ]
+}</code></pre>
+                </div>
+                <p>
+                    You can also pass a <code>.udmp</code> file path directly to UDM, which is especially useful for imported profile files and shortcuts.
+                </p>
+            </section>
+
+            <section class="section-card" id="pro">
+                <h2>UDM Pro</h2>
+                <p class="lead">UDM Pro expands UDM from direct display control into layout persistence, recovery, and deeper customization.</p>
+
+                <div class="feature-grid">
+                    <div class="feature-card"><strong>Profiles</strong> Save, load, rename, delete, import, export, and recover display layouts.</div>
+                    <div class="feature-card"><strong>Failsafe</strong> Keep a known-good recovery target ready.</div>
+                    <div class="feature-card"><strong>Safe switching</strong> Add extra caution to risky profile changes.</div>
+                    <div class="feature-card"><strong>Reload last profile</strong> Quickly re-apply the most recent layout.</div>
+                    <div class="feature-card"><strong>Profile hotkeys</strong> Trigger specific saved layouts from the keyboard.</div>
+                    <div class="feature-card"><strong>Monitor list</strong> Use the detailed multi-column display table in the Options window.</div>
+                    <div class="feature-card"><strong>Display action row</strong> Get faster buttons for the selected display.</div>
+                    <div class="feature-card"><strong>Customize UI</strong> Hide surfaces and menu sections you do not need.</div>
+                    <div class="feature-card"><strong>Display naming</strong> Give your monitors custom names.</div>
+                    <div class="feature-card"><strong>Pro CLI commands</strong> Unlock profile, failsafe, recovery, and naming commands in the CLI.</div>
+                </div>
+
+                <h3>How to upgrade</h3>
+                <ul>
+                    <li>Click <strong>Upgrade!</strong> inside the app</li>
+                    <li>Click any locked Pro control in the Options window</li>
+                    <li>Use <code>udm --upgrade</code> from the command line</li>
+                    <li>Purchase the add-on from the Microsoft Store listing</li>
+                </ul>
+
+                <h3>Restoring your purchase</h3>
+                <p>
+                    UDM Pro is a durable purchase tied to your Microsoft account. Reinstalling the app on the same account should restore access automatically.
+                </p>
+            </section>
+
+            <section class="section-card" id="troubleshooting">
+                <h2>Troubleshooting</h2>
+                <p class="lead">A few quick checks solve most common issues.</p>
+
+                <h3>Where to find logs</h3>
+                <p>
+                    Turn on <strong>Enable support logging</strong> in <strong>Settings → Advanced</strong>. Logs are then written to
+                    <code>%USERPROFILE%\Documents\Ultimate Display Manager\Logs</code>.
+                </p>
+
+                <h3>Where your data lives</h3>
+                <ul>
+                    <li><strong>App settings and cache:</strong> <code>%LOCALAPPDATA%\Ultimate Display Manager</code></li>
+                    <li><strong>Profiles, logs, and recovered items:</strong> <code>%USERPROFILE%\Documents\Ultimate Display Manager</code></li>
+                    <li><strong>Need help finding them?</strong> Use the <strong>Open data folder</strong> button in <strong>Settings → Advanced</strong>.</li>
+                </ul>
+
+                <h3>UDM Pro looks locked after purchase</h3>
+                <ul>
+                    <li>Restart UDM</li>
+                    <li>Make sure the Microsoft Store is signed into the account that purchased Pro</li>
+                    <li>Run <code>udm --update</code> or <code>udm --upgrade --quiet</code> to refresh the status</li>
+                </ul>
+
+                <h3>A CLI command says it requires Pro</h3>
+                <p>
+                    That is expected for profile, failsafe, recovery, and other Pro-only commands. You can launch the purchase flow with <code>udm --upgrade</code>.
+                </p>
+
+                <h3>Resetting settings</h3>
+                <p>
+                    Use <strong>Restore all to default</strong> in Settings to reset most app settings. The CLI equivalent is <code>udm --restoredefault</code>, which requires <code>--force</code> when run non-interactively.
+                </p>
+
+                <h3>Mixed-DPI setups</h3>
+                <p>
+                    UDM is designed to work correctly on mixed-DPI setups, but the window may look a little softer when moved between monitors with very different scaling values.
+                </p>
+
+                <h3>Reporting a bug</h3>
+                <p>
+                    The best report includes a log file, your Windows version, a short description of your monitor setup, what you did, and what you expected to happen.
+                    Contact: <a href="mailto:lucid.direct@hotmail.com">lucid.direct@hotmail.com</a>
+                </p>
+            </section>
+
+            <section class="section-card" id="privacy">
+                <h2>Privacy & data</h2>
+                <p class="lead">UDM stores its working data locally on your PC and does not operate its own data-collection service.</p>
+                <ul>
+                    <li>Your profiles, settings, logs, and app data stay on your machine.</li>
+                    <li>UDM does not send usage data to a UDM-run server.</li>
+                    <li>Store purchase and entitlement checks go through Microsoft Store services.</li>
+                    <li>Update checks also go through Microsoft Store services.</li>
+                </ul>
+                <p>
+                    Read the full <a href="privacy-policy.html">privacy policy</a> for the formal privacy statement.
+                </p>
+            </section>
+
+            <section class="section-card" id="changelog">
+                <h2>Changelog</h2>
+                <p class="lead">A quick history of the public UDM releases covered by this documentation.</p>
+
+                <div class="changelog-card">
+                    <h3>v1.1 — major CLI and workflow update</h3>
+                    <ul>
+                        <li>Full CLI implementation for direct display control, scripting, profile workflows, recovery tools, and JSON output</li>
+                        <li>Display naming for cleaner monitor identification <span class="tier-pill">Pro</span></li>
+                        <li>Stronger failsafe recovery behavior <span class="tier-pill">Pro</span></li>
+                        <li>Profile export and direct profile launching improvements <span class="tier-pill">Pro</span></li>
+                        <li>Support logging improvements, including Lite availability</li>
+                        <li>General reliability and packaging improvements</li>
+                    </ul>
+                </div>
+
+                <div class="changelog-card">
+                    <h3>v1.0.x — initial Microsoft Store release</h3>
+                    <ul>
+                        <li>Released the tray menu, Options window, layout editor, theming system, and Display Properties window</li>
+                        <li>Brought core display control for topology, resolution, refresh rate, orientation, scale, HDR, cloning, and DDC/CI power workflows</li>
+                        <li>Introduced Pro features including profiles, failsafe, monitor list, UI customization, and profile hotkeys</li>
+                        <li>Included the first basic command-line support, later expanded heavily in v1.1</li>
+                    </ul>
+                </div>
+            </section>
+
+            <div class="footer">
+                <p>
+                    Ultimate Display Manager<br>
+                    Developed by <a href="https://linktr.ee/dblucid">dbLucid</a><br>
+                    © 2026
+                </p>
+            </div>
+        </main>
+    </div>
+
+    <div class="lightbox" id="lightbox" onclick="closePreview(event)">
+        <div class="lightbox-panel" role="dialog" aria-modal="true" aria-labelledby="lightbox-title" onclick="event.stopPropagation()">
+            <div class="lightbox-head">
+                <h3 class="lightbox-title" id="lightbox-title">Preview</h3>
+                <button class="lightbox-close" type="button" onclick="closePreview()">Close</button>
+            </div>
+            <div class="lightbox-visual" id="lightbox-visual">Preview image placeholder</div>
+            <div class="lightbox-caption" id="lightbox-caption"></div>
+        </div>
+    </div>
+
+    <script>
+        function toggleToc() {
+            const sidebar = document.getElementById('sidebar');
+            const button = sidebar.querySelector('.sidebar-toggle');
+            const isOpen = sidebar.classList.toggle('open');
+            button.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        }
+
+        function openPreview(title, caption) {
+            const lightbox = document.getElementById('lightbox');
+            document.getElementById('lightbox-title').textContent = title;
+            document.getElementById('lightbox-visual').innerHTML = 'Expanded preview placeholder<br>' + title;
+            document.getElementById('lightbox-caption').textContent = caption;
+            lightbox.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePreview(event) {
+            if (event && event.target && event.target.closest('.lightbox-panel')) {
+                return;
+            }
+            const lightbox = document.getElementById('lightbox');
+            lightbox.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                closePreview();
+            }
+        });
+
+        async function copyCode(button) {
+            const pre = button.closest('.code-block').querySelector('pre');
+            const text = pre.innerText;
+            const original = button.textContent;
+
+            try {
+                await navigator.clipboard.writeText(text);
+                button.textContent = 'Copied';
+                setTimeout(() => {
+                    button.textContent = original;
+                }, 1400);
+            } catch (err) {
+                button.textContent = 'Copy failed';
+                setTimeout(() => {
+                    button.textContent = original;
+                }, 1400);
+            }
+        }
+    </script>
+</body>
+</html>
